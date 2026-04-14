@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import { clerkWebhook } from "./controllers/webhooks.js";
+import makeAdmin from "./scripts/makeAdmin.js";
 
 const app = express();
 
@@ -22,6 +23,8 @@ const PORT = process.env.PORT || 5000;
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running!");
 });
+
+await makeAdmin();
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
