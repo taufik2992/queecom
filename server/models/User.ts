@@ -1,0 +1,28 @@
+import mongoose from "mongoose";
+import { IUser } from "../types/index.js";
+
+const UserSchema = new mongoose.Schema<IUser>(
+  {
+    name: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      unique: true,
+    },
+    clerkId: {
+      type: String,
+      sparse: true,
+      unique: true,
+    },
+    image: { type: String },
+    role: { type: String, enum: ["admin", "user"], default: "user" },
+  },
+  { timestamps: true },
+);
+
+const User = mongoose.model<IUser>("User", UserSchema);
+
+export default User;
