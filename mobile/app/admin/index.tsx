@@ -8,9 +8,11 @@ import {
   RefreshControl,
 } from "react-native";
 import { COLORS, getStatusColor } from "@/constants";
-import { dummyAdminStats } from "@/assets/gggg/assets";
+import { useAuth } from "@clerk/expo";
+import api from "@/constants/api";
 
 export default function AdminDashboard() {
+  const { getToken } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -23,9 +25,22 @@ export default function AdminDashboard() {
   });
 
   const fetchStats = async () => {
-    setStats(dummyAdminStats as any);
-    setLoading(false);
-    setRefreshing(false);
+    try {
+      const token = await getToken();
+      const { data } = await api.get("/admin/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch admin Stats", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
   useEffect(() => {
@@ -59,11 +74,17 @@ export default function AdminDashboard() {
         <View className="flex-row flex-wrap justify-between">
           <StatCard
             label="Total Revenue"
-            value={`$${stats.totalRevenue.toFixed(2)}`}
+            value={`$${(stats.totalRevenue ?? 0).toFixed(2)}`}
           />
-          <StatCard label="Total Orders" value={stats.totalOrders.toString()} />
-          <StatCard label="Products" value={stats.totalProducts.toString()} />
-          <StatCard label="Users" value={stats.totalUsers.toString()} />
+          <StatCard
+            label="Total Orders"
+            value={(stats.totalOrders ?? 0).toString()}
+          />
+          <StatCard
+            label="Products"
+            value={(stats.totalProducts ?? 0).toString()}
+          />
+          <StatCard label="Users" value={(stats.totalUsers ?? 0).toString()} />
         </View>
       </View>
 
@@ -124,7 +145,7 @@ export default function AdminDashboard() {
                   </Text>
                 </View>
                 <Text className="text-primary font-bold text-lg">
-                  ${order.totalAmount.toFixed(2)}
+                  ${(order.totalAmount ?? 0).toFixed(2)}
                 </Text>
               </View>
             </View>

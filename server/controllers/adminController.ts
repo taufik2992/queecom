@@ -27,8 +27,8 @@ export const getDashboardStats = async (req: Request, res: Response) => {
       success: true,
       data: {
         totalUsers,
-        totalProduct,
-        totalOrder,
+        totalProducts: totalProduct,
+        totalOrders: totalOrder,
         totalRevenue,
         recentOrders,
       },
